@@ -1,0 +1,463 @@
+/* ============================================================
+   05 — IN ACTION (one story, three views)
+   A three-step carousel: student → AI tutor → lecturer.
+   Reuses the .dash, .chat, .heat and .risk components.
+   ============================================================ */
+
+.story {
+  position: relative;
+  border-top: 1px solid var(--line);
+  background:
+    radial-gradient(70% 50% at 50% 0%, rgba(0, 255, 102, 0.05), transparent 70%),
+    var(--void);
+}
+
+.story__tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: clamp(30px, 4vw, 54px);
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-bottom: 0;
+}
+
+.story__tab {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 15px clamp(12px, 1.8vw, 22px);
+  border: 0;
+  background: var(--void);
+  color: var(--ink-4);
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: left;
+  transition:
+    background 0.3s var(--ease-out),
+    color 0.3s var(--ease-out),
+    box-shadow 0.3s var(--ease-out);
+}
+
+.story__tab .mono {
+  color: var(--ink-4);
+  font-size: 0.48rem;
+  transition: color 0.3s var(--ease-out);
+}
+
+.story__tab:hover {
+  background: rgba(0, 255, 102, 0.03);
+  color: var(--ink-2);
+}
+
+.story__tab.is-active {
+  background: rgba(0, 255, 102, 0.07);
+  color: var(--ink);
+  box-shadow: inset 0 -2px 0 var(--signal);
+}
+
+.story__tab.is-active .mono {
+  color: var(--signal);
+}
+
+.story__viewport {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--void);
+  transition: height 0.55s var(--ease-out);
+}
+
+.story__track {
+  display: flex;
+  align-items: flex-start;
+  will-change: transform;
+  transition: transform 0.65s cubic-bezier(0.7, 0, 0.2, 1);
+}
+
+.story__slide {
+  flex: 0 0 100%;
+  min-width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+  gap: clamp(24px, 4vw, 60px);
+  align-items: start;
+  padding: clamp(20px, 2.6vw, 36px);
+  opacity: 0.35;
+  transition: opacity 0.5s var(--ease-out);
+}
+
+.story__slide.is-active {
+  opacity: 1;
+}
+
+/* ---------- copy column ---------- */
+
+.story__kicker {
+  color: var(--signal);
+  font-size: 0.5rem;
+  letter-spacing: 0.2em;
+}
+
+.story__title {
+  margin-top: 10px;
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 3vw, 2.7rem);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+}
+
+.story__title em {
+  color: var(--vermilion);
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.story__lead {
+  max-width: 38ch;
+  margin-top: 14px;
+  color: var(--ink-3);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.story__points {
+  display: grid;
+  gap: 10px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.story__points li {
+  display: grid;
+  grid-template-columns: 1.6rem minmax(0, 1fr);
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  color: var(--ink-2);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.story__points .mono {
+  padding-top: 2px;
+  color: var(--vermilion);
+  font-size: 0.48rem;
+}
+
+.story__copy .text-btn {
+  margin-top: 24px;
+}
+
+/* ---------- AI principles ---------- */
+
+.story__principles {
+  display: grid;
+  margin-top: 24px;
+}
+
+.story__principles .principle {
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+  padding-block: 14px;
+}
+
+.story__principles h4 {
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.story__principles .principle p {
+  font-size: 0.83rem;
+  line-height: 1.45;
+}
+
+/* ---------- lecturer board ---------- */
+
+.story__board {
+  display: grid;
+  gap: clamp(14px, 2vw, 22px);
+  min-width: 0;
+}
+
+.story__board > *,
+.story__board-foot > * {
+  min-width: 0;
+}
+
+.story__board .heat {
+  padding: clamp(14px, 1.8vw, 22px);
+  min-width: 0;
+}
+
+.story__board .heat__scroll {
+  max-width: 100%;
+}
+
+.story__board .heat__foot {
+  margin-top: 10px;
+}
+
+.story__board .heat__cell {
+  min-height: 22px;
+}
+
+.story__board-foot {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(14px, 2vw, 22px);
+}
+
+.story__board-foot .risk {
+  padding: clamp(14px, 1.8vw, 22px);
+}
+
+.story__board .risk__name {
+  flex-wrap: wrap;
+}
+
+.story__board .risk__row {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.story__board-foot .risk__list {
+  max-height: 120px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
+}
+
+.story__board-foot .risk__note {
+  margin-top: 10px;
+}
+
+/* ---------- struggle topics ---------- */
+
+.story__struggle {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(14px, 1.8vw, 22px);
+  border: 1px solid var(--line-strong);
+  background: var(--paper);
+}
+
+.story__struggle-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--ink-3);
+  font-size: 0.46rem;
+}
+
+.story__struggle-list {
+  display: grid;
+  gap: 14px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.story__struggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  color: var(--ink-2);
+  font-size: 0.82rem;
+}
+
+.story__struggle-row .mono {
+  color: var(--vermilion);
+  font-size: 0.56rem;
+}
+
+.story__struggle-bar {
+  display: block;
+  height: 3px;
+  margin-top: 7px;
+  background: var(--line);
+}
+
+.story__struggle-bar i {
+  display: block;
+  width: var(--v, 0%);
+  height: 100%;
+  background: linear-gradient(90deg, var(--vermilion), var(--signal));
+}
+
+.story__struggle-note {
+  margin-top: auto;
+  padding-top: 14px;
+  color: var(--ink-4);
+  font-size: 0.4rem;
+  letter-spacing: 0.08em;
+}
+
+/* ---------- controls ---------- */
+
+.story__hint {
+  display: none;
+  flex: 0 0 auto;
+  color: var(--ink-4);
+  font-size: 0.42rem;
+  letter-spacing: 0.16em;
+  white-space: nowrap;
+}
+
+.story__controls {
+  display: flex;
+  align-items: center;
+  gap: clamp(18px, 3vw, 40px);
+  margin-top: 18px;
+}
+
+.story__progress {
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.story__progress i {
+  display: block;
+  width: 33.333%;
+  height: 100%;
+  background: var(--signal);
+  transition: width 0.5s var(--ease-out);
+}
+
+.story__nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.story__arrow {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--line-strong);
+  color: var(--ink-2);
+  font-size: 0.9rem;
+  transition:
+    border-color 0.3s var(--ease-out),
+    color 0.3s var(--ease-out),
+    background 0.3s var(--ease-out);
+}
+
+.story__arrow:hover {
+  border-color: var(--signal);
+  color: var(--signal);
+  background: rgba(0, 255, 102, 0.05);
+}
+
+.story__count {
+  min-width: 5.5ch;
+  text-align: center;
+  color: var(--ink-3);
+  font-size: 0.5rem;
+  letter-spacing: 0.14em;
+}
+
+/* ---------- scroll-driven stage (desktop) ---------- */
+
+@media (min-width: 981px) {
+  .story.is-scroll .story__shell {
+    min-height: 320vh;
+  }
+
+  .story.is-scroll .story__pin {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100vh;
+    padding-top: var(--nav-h);
+    padding-bottom: 14px;
+    overflow: hidden;
+    background:
+      radial-gradient(70% 50% at 50% 0%, rgba(0, 255, 102, 0.05), transparent 70%),
+      var(--void);
+  }
+
+  .story.is-scroll .story__stage {
+    width: 100%;
+    transform-origin: center center;
+  }
+
+  .story.is-scroll .story__tabs {
+    margin-top: 0;
+  }
+
+  .story.is-scroll .story__hint {
+    display: block;
+  }
+
+  .story.is-scroll .story__track,
+  .story.is-scroll .story__viewport,
+  .story.is-scroll .story__progress i {
+    transition: none;
+  }
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 980px) {
+  .story__slide {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .story__lead {
+    max-width: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .story__tabs {
+    grid-template-columns: 1fr;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .story__tab {
+    justify-content: space-between;
+  }
+
+  .story__board-foot {
+    grid-template-columns: 1fr;
+  }
+
+  .story__slide {
+    padding: 20px 16px;
+  }
+
+  .story__controls {
+    gap: 14px;
+  }
+
+  .story__board .heat__table {
+    grid-template-columns: 38px repeat(8, minmax(20px, 1fr));
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .story__board .heat__cell {
+    min-height: 24px;
+    font-size: 0.36rem;
+  }
+
+  .story__board .heat__corner,
+  .story__board .heat__group,
+  .story__board .heat__week {
+    font-size: 0.34rem;
+  }
+}

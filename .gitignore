@@ -1,0 +1,64 @@
+# Dependencies
+node_modules/
+
+# Build output (Vercel runs `vite build`)
+dist/
+demo/dist/
+assets/
+.vercel/
+
+# Vite / caches
+.vite/
+.cache/
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Test / coverage
+coverage/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+
+# Local backups / archives
+.git.zip
+*.zip
+
+# Scratch files and one-off debug scripts
+scratch/
+_check-*.mjs
+_dbg*.mjs
+
+# Stray local page copies
+/index (1).html
+_story-section.html
+
+# Old duplicate site (previous version, not deployed)
+demo/
+
+# Orphan legacy files (the page loads /src/main.js and /styles instead)
+/script.js
+/style.css
+
+# Large generated image references in docs (keep the PDF proposal)
+docs/*.jpg
+docs/*.jpeg
+docs/*.png
+
+# Misc
+*.local

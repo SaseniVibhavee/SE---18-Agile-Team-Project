@@ -1,0 +1,953 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Attesta — Fingerprint Attendance &amp; Student Catch-Up</title>
+  <meta name="description" content="Fingerprint attendance that can't be faked or shared, works offline, and helps students catch up on the classes they missed." />
+  <meta name="theme-color" content="#010302" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600&family=Caveat:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23010302'/%3E%3Cg fill='none' stroke='%2300FF66' stroke-width='1.8'%3E%3Cellipse cx='16' cy='16' rx='11' ry='13'/%3E%3Cellipse cx='16' cy='16' rx='7.5' ry='9.2'/%3E%3Cellipse cx='16' cy='16' rx='4' ry='5.4'/%3E%3C/g%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="./styles/tokens.css" />
+  <link rel="stylesheet" href="./styles/base.css" />
+  <link rel="stylesheet" href="./styles/sections.css" />
+  <script>
+    document.documentElement.classList.add('js');
+    try {
+      var savedTheme = localStorage.getItem('attesta_theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    } catch (e) {}
+  </script>
+</head>
+<body class="is-loading">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Grain overlay -->
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- Interactive 2D mathematical ridge wave background -->
+  <canvas id="ridge-canvas" aria-hidden="true"></canvas>
+
+  <!-- Three.js tube cursor -->
+  <div class="tubes-cursor" data-tubes-cursor aria-hidden="true">
+    <canvas class="tubes-cursor__canvas"></canvas>
+  </div>
+
+  <!-- ============ PRELOADER ============ -->
+  <div class="preloader" data-preloader aria-hidden="true">
+    <div class="preloader__meta mono">
+      <span>ATTESTA // STARTING UP</span>
+      <span data-preloader-clock>00:00:00</span>
+    </div>
+
+    <div class="preloader__print" data-preloader-print>
+      <svg class="preloader__svg" viewBox="0 0 400 480" data-preloader-svg aria-hidden="true"></svg>
+      <div class="preloader__scan" data-preloader-scan></div>
+      <div class="preloader__pulse" data-preloader-pulse></div>
+    </div>
+
+    <div class="preloader__readout">
+      <p class="mono preloader__status" data-preloader-status>WARMING UP THE SENSOR</p>
+      <p class="preloader__percent mono" data-preloader-percent>0%</p>
+    </div>
+
+    <p class="preloader__stamp" data-preloader-stamp>PRESENT</p>
+
+    <div class="preloader__foot mono">
+      <span>SE 18 · STUDENT ATTENDANCE</span>
+      <button class="preloader__skip" type="button" data-preloader-skip>SKIP →</button>
+    </div>
+  </div>
+
+  <!-- ============ NAVIGATION ============ -->
+  <header class="nav" data-nav>
+    <a class="brand" href="#top" aria-label="Attesta home">
+      <svg class="brand__mark" viewBox="0 0 28 28" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M14 3.2c-5.1 0-9.2 4.1-9.2 9.2 0 3.4 1 6 2.6 7.8" />
+        <path d="M14 6.8c-3.1 0-5.6 2.5-5.6 5.6 0 2.4.7 4.3 1.9 5.8" />
+        <path d="M14 10.3c-1.2 0-2.1.9-2.1 2.1 0 1.4.5 2.7 1.3 3.8" />
+        <path d="M20.6 6.5c1.6 1.8 2.6 4.2 2.6 6.8 0 3.1-.9 5.7-2.4 7.7" />
+        <path d="M23.1 3.7C25.3 6.4 26.6 9.7 26.6 13.3c0 3.7-1 6.9-2.8 9.5" />
+      </svg>
+      <span class="brand__word">Attesta</span>
+      <sup class="brand__sup mono">PRO</sup>
+    </a>
+
+    <nav class="nav__links" aria-label="Primary">
+      <a href="#top">Home</a>
+      <a href="#problem">About</a>
+      <a href="#solution">Product</a>
+      <a href="#team">Team</a>
+    </nav>
+
+    <div class="nav__right">
+      <button class="nav__theme mono" type="button" data-theme-toggle aria-pressed="false" aria-label="Toggle black and white theme">
+        <span class="theme-switch" aria-hidden="true">
+          <span class="theme-switch__knob"></span>
+        </span>
+        <span class="theme-label" data-theme-label>DARK</span>
+      </button>
+      <button class="nav__sound mono" type="button" data-sound-toggle aria-pressed="false" aria-label="Toggle sound effects">
+        <span class="sound-wave" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>SOUND</span>
+      </button>
+      <a class="nav__cta" href="#contact"><span>Try the Sensor</span></a>
+      <button class="nav__menu" type="button" data-menu-open aria-expanded="false" aria-controls="overlay-menu">
+        <span class="mono">INDEX</span>
+        <span class="nav__burger" aria-hidden="true"><i></i><i></i></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============ OVERLAY MENU ============ -->
+  <div class="overlay-menu" id="overlay-menu" data-menu hidden>
+    <div class="overlay-menu__ridges" aria-hidden="true">
+      <svg viewBox="0 0 800 800" data-menu-svg></svg>
+    </div>
+    <div class="overlay-menu__top">
+      <span class="mono">MENU</span>
+      <button class="overlay-menu__close mono" type="button" data-menu-close>CLOSE ✕</button>
+    </div>
+    <nav class="overlay-menu__nav" aria-label="Overlay">
+      <a href="#top"><span class="mono">01</span> Home</a>
+      <a href="#problem"><span class="mono">02</span> About</a>
+      <a href="#solution"><span class="mono">03</span> Product</a>
+      <a href="#team"><span class="mono">04</span> Team</a>
+    </nav>
+    <div class="overlay-menu__foot mono">
+      <span>ATTESTA</span>
+      <span>2026 RELEASE</span>
+    </div>
+  </div>
+
+  <!-- Scroll progress rail -->
+  <div class="rail" aria-hidden="true">
+    <span class="rail__label mono" data-rail-label>000</span>
+    <span class="rail__track"><span class="rail__fill" data-rail-fill></span></span>
+  </div>
+
+  <main id="main">
+    <!-- ============ HERO ============ -->
+    <section class="hero" id="top">
+      <div class="hero__canvas" id="hero-canvas" aria-hidden="true"></div>
+      <div class="hero__vignette" aria-hidden="true"></div>
+
+      <div class="hero__inner">
+        <div class="hero__top">
+          <p class="mono hero__coords">PRIVATE FROM THE FIRST TOUCH</p>
+        </div>
+
+        <h1 class="hero__title" data-hero-title>
+          <span class="line"><span class="line__inner">Be <em>present.</em></span></span>
+          <span class="line"><span class="line__inner">Be <em>seen.</em></span></span>
+          <span class="line line--indent"><span class="line__inner">Catch <em>up.</em></span></span>
+        </h1>
+
+        <div class="hero__foot">
+          <div class="hero__sub-wrap">
+            <span class="hero__rule" aria-hidden="true"></span>
+            <p class="hero__sub">Attendance you can't fake or forward. And when you miss a class, an AI tutor helps you catch up before you fall behind.</p>
+          </div>
+          <div class="hero__ctas">
+            <a class="btn btn--ink" href="#problem"><span>See the Problem</span><span class="btn__arrow">→</span></a>
+            <a class="btn btn--ghost" href="#solution">See the Loop</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero__device-note mono">
+        <span class="dot dot--live"></span>
+        DEV-01 · HALL 3B · 84% BATTERY · ALL SYNCED
+      </div>
+
+      <a class="hero__scroll mono" href="#problem">
+        <span>SCROLL DOWN</span>
+        <span class="hero__scroll-line" aria-hidden="true"></span>
+      </a>
+    </section>
+
+    <!-- ============ MARQUEE TICKER ============ -->
+    <div class="marquee" data-marquee aria-hidden="true">
+      <div class="marquee__track" data-marquee-track>
+        <div class="marquee__group">
+          <span>Fingerprint Check-in</span><i class="marquee__dot"></i>
+          <span class="marquee__em">No Proxy Sign-ins</span><i class="marquee__dot"></i>
+          <span>Match in 0.4s</span><i class="marquee__dot"></i>
+          <span class="marquee__em">Works Offline</span><i class="marquee__dot"></i>
+          <span>AI Tutor</span><i class="marquee__dot"></i>
+          <span>Live Sync</span><i class="marquee__dot"></i>
+        </div>
+        <div class="marquee__group">
+          <span>Fingerprint Check-in</span><i class="marquee__dot"></i>
+          <span class="marquee__em">No Proxy Sign-ins</span><i class="marquee__dot"></i>
+          <span>Match in 0.4s</span><i class="marquee__dot"></i>
+          <span class="marquee__em">Works Offline</span><i class="marquee__dot"></i>
+          <span>AI Tutor</span><i class="marquee__dot"></i>
+          <span>Live Sync</span><i class="marquee__dot"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 01 THE PROBLEM ============ -->
+    <section class="section problem" id="problem">
+      <div class="shell">
+        <div class="section-head section-head--split">
+          <p class="eyebrow mono"><span>01</span> The Attendance Problem</p>
+          <h2 class="h2 reveal">A signature is a promise.<br /><em>A screenshot is not.</em></h2>
+          <div class="section-head__lead">
+            <p>Paper sheets trust everyone. QR codes get screenshotted and shared in seconds. Attesta asks for a fingerprint — <strong>then uses that record to help students before they fall behind.</strong></p>
+          </div>
+        </div>
+
+        <figure class="problem__question" data-reveal>
+          <p class="problem__question-label mono">THE REAL COST</p>
+          <blockquote>How much attendance are you actually losing — and <em>who is going to help you</em> catch up on the lecture and get ready for the exam?</blockquote>
+        </figure>
+
+        <div class="problem__spread">
+          <!-- Reconstructed Paper Register -->
+          <figure class="register" data-reveal>
+            <span class="register__tape register__tape--a" aria-hidden="true"></span>
+            <span class="register__tape register__tape--b" aria-hidden="true"></span>
+            <div class="register__head">
+              <div>
+                <p class="mono">AUDITORIUM / HALL 04</p>
+                <p class="register__title">Paper Sign-in Sheet — Week 04</p>
+              </div>
+              <p class="mono register__date">12 / 08</p>
+            </div>
+            <table class="register__table">
+              <thead>
+                <tr><th scope="col" class="mono">#</th><th scope="col" class="mono">Student</th><th scope="col" class="mono">Signature</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="mono">01</td><td>A. Fernando</td><td class="register__sig">A.F.</td></tr>
+                <tr><td class="mono">02</td><td>N. Perera</td><td class="register__sig">N.P.</td></tr>
+                <tr><td class="mono">03</td><td>T. Jayasinghe</td><td class="register__sig register__sig--same">A.F.</td></tr>
+                <tr><td class="mono">04</td><td>S. Rajendran</td><td class="register__sig">S.R.</td></tr>
+                <tr><td class="mono">05</td><td>M. Fonseka</td><td class="register__sig register__sig--same">A.F.</td></tr>
+                <tr><td class="mono">06</td><td>K. Bandara</td><td></td></tr>
+                <tr><td class="mono">07</td><td>D. Silva</td><td class="register__sig">D.S.</td></tr>
+                <tr><td class="mono">08</td><td>H. Weerasinghe</td><td class="register__sig register__sig--same">A.F.</td></tr>
+              </tbody>
+            </table>
+            <p class="mono register__note register__note--a">friends sign for friends</p>
+            <p class="mono register__note register__note--b">3 fakes, 1 pen</p>
+            <span class="register__stain" aria-hidden="true"></span>
+            <figcaption class="register__cap mono">EVIDENCE — AUDITED CLASS REGISTER</figcaption>
+          </figure>
+
+          <!-- Interactive QR Proxy Forwarding Demo -->
+          <div class="share" data-reveal>
+            <div class="share__head">
+              <p class="mono">TRY IT // HOW A QR CODE LEAKS</p>
+              <p class="mono share__hint">KEEP SCROLLING ↓</p>
+            </div>
+
+            <div class="share__stage" data-share-stage>
+              <div class="share__qr" data-qr aria-label="Session QR code being forwarded into a group chat">
+                <canvas class="share__canvas" width="220" height="220" data-qr-canvas aria-hidden="true"></canvas>
+                <p class="mono share__qr-label">SESSION · IS2103 · W04</p>
+                <span class="share__qr-corner share__qr-corner--tl" aria-hidden="true"></span>
+                <span class="share__qr-corner share__qr-corner--br" aria-hidden="true"></span>
+              </div>
+
+              <div class="share__drop" data-share-drop>
+                <span class="mono">DROP HERE TO SHARE</span>
+                <div class="share__msg">
+                  <span class="mono">WHATSAPP · GROUP CHAT</span>
+                  <p>“Yo scan this QR, I'm not on campus”</p>
+                  <span class="share__msg-tick">✓✓</span>
+                </div>
+                <div class="share__msg share__msg--two">
+                  <span class="mono">WHATSAPP · +3 PEERS</span>
+                  <p>“Marked present from bed, thanks!”</p>
+                  <span class="share__msg-tick">✓✓</span>
+                </div>
+              </div>
+
+              <div class="share__result" data-share-result aria-hidden="true">
+                <span class="share__stamp">FAKE ATTENDANCE</span>
+                <p>Marked present while sitting 12 km off campus.</p>
+              </div>
+            </div>
+
+            <p class="share__caption">A QR code can be screenshotted and shared in seconds. A fingerprint only works with a real finger on the sensor.</p>
+          </div>
+        </div>
+
+        <div class="problem__statements">
+          <p class="reveal"><span class="mono">&lt; 0.4s</span> to check a fingerprint.</p>
+          <p class="reveal"><span class="mono">1 record</span> per finger, per class.</p>
+          <p class="reveal"><span class="mono">7 days</span> is all it takes for missed classes to become drop-outs.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 02 WHAT WE SOLVE — 3D MORPH ============ -->
+    <section class="morph" id="shape" data-morph aria-label="What Attesta does, in four shapes">
+      <div class="morph__pin">
+        <div class="morph__canvas" id="morph-canvas" aria-hidden="true"></div>
+        <div class="morph__scrim" aria-hidden="true"></div>
+
+        <div class="morph__ui">
+          <header class="morph__head">
+            <div class="morph__intro">
+              <p class="eyebrow mono"><span>02</span> The Idea</p>
+              <p class="morph__about">Attesta is two things in one: attendance you can't fake, and a tutor that helps you catch up. A fingerprint replaces the QR code. Then the AI uses your own class notes to fill the gaps.</p>
+            </div>
+            <p class="morph__hint mono">SCROLL TO CHANGE SHAPE · MOVE TO SPIN · CLICK TO SCATTER</p>
+          </header>
+
+          <div class="morph__bottom">
+            <div class="morph__stages">
+              <article class="morph__stage is-on" data-morph-stage="0">
+                <h3 class="morph__title">It knows <em>you</em>.</h3>
+                <p>One finger, one match. Attendance that can't be screenshotted, copied, or forwarded.</p>
+              </article>
+              <article class="morph__stage" data-morph-stage="1">
+                <h3 class="morph__title">It reads <em>the hall</em>.</h3>
+                <p>Every check-in syncs live, so lecturers see who showed up — and who is slipping — before class ends.</p>
+              </article>
+              <article class="morph__stage" data-morph-stage="2">
+                <h3 class="morph__title">It teaches <em>the week</em>.</h3>
+                <p>An AI tutor that uses your own lecture slides. It asks what you know, explains what you missed, and brings in your lecturer when you're stuck.</p>
+              </article>
+              <article class="morph__stage" data-morph-stage="3">
+                <h3 class="morph__title">Meet <em>Attesta</em>.</h3>
+                <p>Attendance and catch-up in one place. Show up every day — and when you can't, Attesta rebuilds the week you missed from your own class material.</p>
+              </article>
+            </div>
+
+            <footer class="morph__foot mono">
+              <span data-morph-readout>01 · BIOMETRIC</span>
+              <span class="morph__ticks" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            </footer>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 02b THE IDEA, WRAPPED ============ -->
+    <section class="section verdict" id="verdict">
+      <div class="shell">
+        <div class="section-head section-head--rule">
+          <p class="eyebrow mono"><span>02</span> The Short Version</p>
+          <h2 class="h2 reveal">Show up <em>every day.</em><br />Miss one — <em>we teach it back.</em></h2>
+          <p class="section-head__lead">That's the whole idea. Attesta makes showing up real and easy to track. Miss a week, and it rebuilds what you missed from your own class material — before a missed week becomes a failed module.</p>
+        </div>
+
+        <ol class="verdict__grid">
+          <li class="verdict__card" data-reveal>
+            <span class="mono verdict__num">01</span>
+            <p class="mono verdict__kicker">SHOW UP</p>
+            <h3>Attendance you can't fake.</h3>
+            <p>A finger on the sensor instead of a QR in a group chat. Showing up becomes the easy, verified default.</p>
+          </li>
+          <li class="verdict__card" data-reveal>
+            <span class="mono verdict__num">02</span>
+            <p class="mono verdict__kicker">CATCH UP</p>
+            <h3>Missed it? Learn it back.</h3>
+            <p>Miss a class and the AI tutor rebuilds that week from your own slides. It asks what you know, explains the gaps, and calls in your lecturer when you need more help.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============ 03 THE ATTESTA LOOP — ABOUT & SOLUTION ============ -->
+    <section class="section loop-sec" id="solution">
+      <div class="shell">
+        <div class="section-head section-head--rule">
+          <p class="eyebrow mono"><span>03</span> The Attesta Loop</p>
+          <h2 class="h2 reveal">We aren’t the first tools.<br /><em>We close the loop.</em></h2>
+          <p class="section-head__lead">Attesta keeps students in class. A fingerprint becomes a record. The record shows who is slipping. And that warning turns into real help — before a missed week becomes a dropped degree.</p>
+        </div>
+
+        <ol class="loop" aria-label="How Attesta works">
+          <li class="loop__step" data-reveal>
+            <span class="loop__num mono">01</span>
+            <div>
+              <p class="loop__kicker mono">PROVE</p>
+              <h3>A finger on glass.</h3>
+              <p>The sensor checks your fingerprint on the device in under 0.4 seconds. No screenshots, no shared links, no signing in for a friend. You have to be there.</p>
+            </div>
+          </li>
+          <li class="loop__step" data-reveal>
+            <span class="loop__num mono">02</span>
+            <div>
+              <p class="loop__kicker mono">RECORD</p>
+              <h3>Offline by design.</h3>
+              <p>The device saves up to 512 check-ins on its own memory. If the Wi-Fi drops, scans keep working and sync when it's back.</p>
+            </div>
+          </li>
+          <li class="loop__step" data-reveal>
+            <span class="loop__num mono">03</span>
+            <div>
+              <p class="loop__kicker mono">REVEAL</p>
+              <h3>Who is slipping.</h3>
+              <p>Lecturers see attendance by class and group, with at-risk students flagged early — weeks before a missed module becomes a drop-out.</p>
+            </div>
+          </li>
+          <li class="loop__step" data-reveal>
+            <span class="loop__num mono">04</span>
+            <div>
+              <p class="loop__kicker mono">RECOVER</p>
+              <h3>Catch-up, grounded.</h3>
+              <p>The AI tutor only uses your uploaded lecture material. It asks what you know, explains what you missed, and passes you to your lecturer if you're still stuck.</p>
+            </div>
+          </li>
+        </ol>
+
+        <div class="loop__hardware" data-reveal>
+          <p class="loop__label mono">THE HARDWARE</p>
+          <ul class="loop__specs mono">
+            <li><span>SENSOR</span><span>508 DPI optical · R307</span></li>
+            <li><span>COMPUTE</span><span>ESP32 dual-core · 240 MHz</span></li>
+            <li><span>OFFLINE</span><span>512-record flash buffer</span></li>
+            <li><span>POWER</span><span>1,200 mAh · 14h mixed use</span></li>
+          </ul>
+        </div>
+
+        <div class="loop__versus" data-reveal>
+          <p class="loop__label mono">WHY IT'S DIFFERENT</p>
+          <ul class="loop__versus-list">
+            <li><span class="loop__vs mono">QR CODE</span><span>Screenshotted and forwarded in seconds.</span></li>
+            <li><span class="loop__vs mono">RFID CARD</span><span>Handed to a friend at the door.</span></li>
+            <li><span class="loop__vs mono">LMS LOGIN</span><span>A password anyone can share.</span></li>
+            <li class="is-attesta"><span class="loop__vs mono">ATTESTA</span><span>Needs your finger — then teaches you the week you missed.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 04 THE RESEARCH ============ -->
+    <section class="section metrics-sec" id="metrics" aria-labelledby="metrics-heading">
+      <div class="shell">
+        <div class="section-head section-head--rule">
+          <p class="eyebrow mono"><span>04</span> The Research</p>
+          <h2 class="h2 reveal" id="metrics-heading">Absence is common.<br /><em>Noticing it isn't.</em></h2>
+          <div class="section-head__lead">
+            <p>Attendance studies across universities keep finding the same gaps: students get marked present when they never showed up, and the ones falling behind are only caught after it's too late.</p>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card" data-reveal>
+            <p class="metric-card__label mono">SIGNED IN, NOT THERE</p>
+            <span class="metric-card__num" data-counter="38" data-suffix="%" data-decimals="0">38%</span>
+            <p class="metric-card__desc">Students who say a friend has marked them present while they were somewhere else.</p>
+          </div>
+
+          <div class="metric-card" data-reveal>
+            <p class="metric-card__label mono">FAILING FROM ABSENCE</p>
+            <span class="metric-card__num" data-counter="71" data-suffix="%" data-decimals="0">71%</span>
+            <p class="metric-card__desc">Students who fail a module had already missed more than a fifth of its lectures.</p>
+          </div>
+
+          <div class="metric-card" data-reveal>
+            <p class="metric-card__label mono">CAUGHT TOO LATE</p>
+            <span class="metric-card__num" data-counter="1" data-suffix=" in 3" data-decimals="0">1 in 3</span>
+            <p class="metric-card__desc">At-risk students are only flagged after their first failed assessment — never before it.</p>
+          </div>
+
+          <div class="metric-card" data-reveal>
+            <p class="metric-card__label mono">LECTURES MISSED</p>
+            <span class="metric-card__num" data-counter="14" data-decimals="0">14</span>
+            <p class="metric-card__desc">Average lectures a student misses each semester — unrecorded and unaudited.</p>
+          </div>
+        </div>
+
+        <p class="metrics-note mono">COMPILED FROM PUBLISHED HIGHER-EDUCATION ATTENDANCE RESEARCH · 2023–2025</p>
+      </div>
+    </section>
+
+    <!-- ============ 05 IN ACTION — ONE STORY, THREE VIEWS ============ -->
+    <section class="section story" id="story">
+      <div class="shell story__shell">
+        <div class="section-head section-head--rule">
+          <p class="eyebrow mono"><span>05</span> In Action</p>
+          <h2 class="h2 reveal">One missed class.<br /><em>Three people respond.</em></h2>
+          <p class="section-head__lead">A student skips a lecture. Attesta spots the gap, asks what they already know, and teaches the missing week from their own slides. Their lecturer sees the same signal across the class — and steps in early.</p>
+        </div>
+
+        <div class="story__pin" data-story-pin>
+        <div class="story__stage" data-story-stage>
+
+        <div class="story__tabs" role="tablist" aria-label="Story steps">
+          <button class="story__tab is-active" type="button" role="tab" aria-selected="true" aria-controls="story-panel-0" id="story-tab-0" data-story-tab="0"><span class="mono">01</span> The student</button>
+          <button class="story__tab" type="button" role="tab" aria-selected="false" aria-controls="story-panel-1" id="story-tab-1" data-story-tab="1"><span class="mono">02</span> The AI tutor</button>
+          <button class="story__tab" type="button" role="tab" aria-selected="false" aria-controls="story-panel-2" id="story-tab-2" data-story-tab="2"><span class="mono">03</span> The lecturer</button>
+        </div>
+
+        <div class="story__viewport" data-story-viewport>
+          <div class="story__track" data-story-track>
+            <!-- STEP 01 — STUDENT -->
+            <article class="story__slide is-active" id="story-panel-0" role="tabpanel" aria-labelledby="story-tab-0" data-story-slide="0">
+              <div class="story__copy">
+                <p class="story__kicker mono">STEP 01 · THE STUDENT</p>
+                <h3 class="story__title">You missed <em>Week 06.</em></h3>
+                <p class="story__lead">Attesta already knows which lecture you skipped and what it covered. Your attendance, your catch-up list, and a way to ask for help — all in one place.</p>
+                <ul class="story__points">
+                  <li><span class="mono">01</span> 84% overall, with one lecture missed.</li>
+                  <li><span class="mono">02</span> A short catch-up list built from that lecture.</li>
+                  <li><span class="mono">03</span> Ask for help privately, in one tap.</li>
+                </ul>
+                <button class="text-btn mono" type="button" data-support-open>Ask for help <span>→</span></button>
+              </div>
+
+              <div class="dash">
+                <span class="dash__crop dash__crop--tl" aria-hidden="true"></span>
+                <span class="dash__crop dash__crop--tr" aria-hidden="true"></span>
+                <span class="dash__crop dash__crop--bl" aria-hidden="true"></span>
+                <span class="dash__crop dash__crop--br" aria-hidden="true"></span>
+
+                <div class="dash__top mono">
+                  <span>STUDENT / 2023/IS/018</span>
+                  <span>SEMESTER 04 · WEEK 07</span>
+                </div>
+
+                <div class="dash__grid">
+                  <div class="dash__ring-wrap">
+                    <svg class="ring" viewBox="0 0 200 200" role="img" aria-label="Overall attendance 84 percent">
+                      <circle class="ring__bg" cx="100" cy="100" r="76" />
+                      <circle class="ring__fg" cx="100" cy="100" r="76" data-ring />
+                    </svg>
+                    <div class="ring__center">
+                      <span class="ring__value" data-ring-value>84<small>%</small></span>
+                      <span class="mono ring__cap">OVERALL RATE</span>
+                    </div>
+                    <p class="ring__foot mono">PRESENT 21 / 25 SESSIONS</p>
+                  </div>
+
+                  <ul class="modules">
+                    <li>
+                      <div class="module__row"><span>IS2103 · Relational Databases</span><span class="mono">92%</span></div>
+                      <span class="module__bar"><i style="--v:92%"></i></span>
+                    </li>
+                    <li>
+                      <div class="module__row"><span>IS2201 · Software Engineering</span><span class="mono">78%</span></div>
+                      <span class="module__bar"><i style="--v:78%"></i></span>
+                    </li>
+                    <li>
+                      <div class="module__row"><span>IS2304 · Network Protocols</span><span class="mono">80%</span></div>
+                      <span class="module__bar"><i style="--v:80%"></i></span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="catchup">
+                  <div class="catchup__head">
+                    <p class="mono">WEEK 06 / CATCH-UP CHECKLIST</p>
+                    <p class="mono">DUE: SUN 23:59</p>
+                  </div>
+                  <p class="catchup__question">Did you finish last week's work?</p>
+
+                  <ul class="tasks" data-tasks>
+                    <li class="task" data-task="1">
+                      <span class="task__text">Database Normalisation Tutorial · Questions 1–6</span>
+                      <span class="task__acts">
+                        <button type="button" class="task__btn mono" data-task-done aria-pressed="false">Done</button>
+                        <button type="button" class="task__btn task__btn--help mono" data-task-help aria-pressed="false">Need Help</button>
+                      </span>
+                    </li>
+                    <li class="task" data-task="2">
+                      <span class="task__text">Lecture 06 Recording · 40 min</span>
+                      <span class="task__acts">
+                        <button type="button" class="task__btn mono" data-task-done aria-pressed="false">Done</button>
+                        <button type="button" class="task__btn task__btn--help mono" data-task-help aria-pressed="false">Need Help</button>
+                      </span>
+                    </li>
+                    <li class="task" data-task="3">
+                      <span class="task__text">ER Diagram Practice · Weak Entities</span>
+                      <span class="task__acts">
+                        <button type="button" class="task__btn mono" data-task-done aria-pressed="false">Done</button>
+                        <button type="button" class="task__btn task__btn--help mono" data-task-help aria-pressed="false">Need Help</button>
+                      </span>
+                    </li>
+                  </ul>
+
+                  <p class="catchup__status mono" data-task-status aria-live="polite">0 OF 3 DONE — TAP AN ITEM TO START.</p>
+                </div>
+
+                <div class="dash__foot mono">
+                  <span>UPCOMING · MON 08:30 · LECTURE THEATRE 04</span>
+                  <span class="dash__sync"><i class="dot dot--live"></i> SYNCED 09:41</span>
+                </div>
+
+                <div class="support-fly" data-support-fly aria-hidden="true">
+                  <svg viewBox="0 0 48 40"><path d="M2 18 46 2 32 38 22 24 2 18Z" /><path d="M22 24 46 2" /></svg>
+                </div>
+              </div>
+            </article>
+
+            <!-- STEP 02 — AI TUTOR -->
+            <article class="story__slide" id="story-panel-1" role="tabpanel" aria-labelledby="story-tab-1" aria-hidden="true" data-story-slide="1">
+              <div class="story__copy">
+                <p class="story__kicker mono">STEP 02 · THE AI TUTOR</p>
+                <h3 class="story__title">It asks what you know <em>first.</em></h3>
+                <p class="story__lead">Then it teaches from your own lecture slides — one step at a time, and only from course material.</p>
+
+                <div class="story__principles">
+                  <div class="principle">
+                    <span class="mono">01</span>
+                    <h4>Only your course material</h4>
+                    <p>Answers come from your lecture slides and lab PDFs. Not the open internet.</p>
+                  </div>
+                  <div class="principle">
+                    <span class="mono">02</span>
+                    <h4>Type or talk</h4>
+                    <p>Type your question or hold the mic and just say it.</p>
+                  </div>
+                  <div class="principle">
+                    <span class="mono">03</span>
+                    <h4>Hands off to your lecturer</h4>
+                    <p>If you're still stuck, Attesta writes a clear request for your lecturer.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="chat" data-chat>
+                <div class="chat__top mono">
+                  <span class="chat__file"><span class="chat__pdf">PDF</span> IS2103_Lecture06_RelationalSchema.pdf</span>
+                  <span class="chat__live"><i class="dot dot--live"></i> VERIFIED SOURCE</span>
+                </div>
+
+                <div class="chat__log" data-chat-log aria-live="polite"></div>
+
+                <div class="chat__composer">
+                  <div class="chat__wave" data-chat-wave aria-hidden="true">
+                    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                  </div>
+                  <span class="mono chat__composer-hint" data-chat-hint>ASK A QUESTION ABOUT WEEK 06</span>
+                  <button class="chat__mic" type="button" data-chat-mic aria-label="Record question using speech input">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3Z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M8 21h8"/></svg>
+                  </button>
+                </div>
+
+                <div class="chat__foot">
+                  <div class="chat__questions" data-chat-questions></div>
+                  <button class="text-btn text-btn--muted mono" type="button" data-chat-replay>↻ Replay the demo</button>
+                </div>
+
+                <p class="chat__disclaimer mono">DEMO · ANSWERS COME FROM THE COURSE MATERIAL</p>
+              </div>
+            </article>
+
+            <!-- STEP 03 — LECTURER -->
+            <article class="story__slide" id="story-panel-2" role="tabpanel" aria-labelledby="story-tab-2" aria-hidden="true" data-story-slide="2">
+              <div class="story__copy">
+                <p class="story__kicker mono">STEP 03 · THE LECTURER</p>
+                <h3 class="story__title">The whole class, <em>at a glance.</em></h3>
+                <p class="story__lead">Lecturers see which groups are missing class and which topics students keep getting stuck on — weeks before exams.</p>
+                <ul class="story__points">
+                  <li><span class="mono">01</span> Attendance by group and week.</li>
+                  <li><span class="mono">02</span> At-risk students flagged early.</li>
+                  <li><span class="mono">03</span> The topics the class asks about most.</li>
+                </ul>
+              </div>
+
+              <div class="story__board">
+                <div class="heat" data-heat>
+                  <div class="heat__head">
+                    <p class="mono">CLASS MAP / GROUPS A1–A4</p>
+                    <p class="mono heat__legend"><span>&lt;60%</span><i></i><span>100%</span></p>
+                  </div>
+                  <div class="heat__scroll">
+                    <div class="heat__table" role="group" aria-label="Attendance heatmap matrix by subgroup and academic week">
+                      <div class="heat__corner mono">GROUP</div>
+                      <div class="heat__weeks mono" data-heat-weeks></div>
+                      <div class="heat__rows" data-heat-rows></div>
+                    </div>
+                  </div>
+                  <div class="heat__tooltip mono" data-heat-tip hidden></div>
+                  <p class="heat__foot mono">WEEKS 01 → 08 · % PRESENT · HOVER A CELL FOR DETAIL</p>
+                </div>
+
+                <div class="story__board-foot">
+                  <div class="risk" data-risk>
+                    <div class="risk__head">
+                      <p class="mono">AT-RISK CUT-OFF</p>
+                      <p class="risk__count"><span data-risk-count>2</span><span class="mono"> FLAGGED</span></p>
+                    </div>
+                    <label class="visually-hidden" for="risk-range">Attendance minimum threshold percentage</label>
+                    <input id="risk-range" class="range range--risk" type="range" min="50" max="90" step="1" value="75" data-risk-range />
+                    <div class="risk__scale mono"><span>50%</span><span data-risk-value>75%</span><span>90%</span></div>
+
+                    <ul class="risk__list" data-risk-list></ul>
+                    <p class="risk__note mono">UPDATES AS YOU MOVE THE SLIDER</p>
+                  </div>
+
+                  <div class="story__struggle">
+                    <div class="story__struggle-head">
+                      <p class="mono">WHERE THE CLASS STRUGGLES</p>
+                      <p class="mono">WEEK 06</p>
+                    </div>
+                    <ul class="story__struggle-list">
+                      <li>
+                        <div class="story__struggle-row"><span>BCNF &amp; normal forms</span><span class="mono">62%</span></div>
+                        <span class="story__struggle-bar"><i style="--v:62%"></i></span>
+                      </li>
+                      <li>
+                        <div class="story__struggle-row"><span>Weak entities</span><span class="mono">48%</span></div>
+                        <span class="story__struggle-bar"><i style="--v:48%"></i></span>
+                      </li>
+                      <li>
+                        <div class="story__struggle-row"><span>Functional dependencies</span><span class="mono">41%</span></div>
+                        <span class="story__struggle-bar"><i style="--v:41%"></i></span>
+                      </li>
+                    </ul>
+                    <p class="story__struggle-note mono">FROM HELP REQUESTS + AI QUESTIONS</p>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="story__controls">
+          <span class="story__hint mono">Scroll to advance</span>
+          <div class="story__progress" aria-hidden="true"><i data-story-bar></i></div>
+          <div class="story__nav">
+            <button class="story__arrow mono" type="button" data-story-prev aria-label="Previous step">←</button>
+            <span class="story__count mono" data-story-count>01 / 03</span>
+            <button class="story__arrow mono" type="button" data-story-next aria-label="Next step">→</button>
+          </div>
+        </div>
+
+        </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MARQUEE TICKER 2 ============ -->
+    <div class="marquee marquee--ember" data-marquee aria-hidden="true">
+      <div class="marquee__track" data-marquee-track>
+        <div class="marquee__group">
+          <span>Fingerprint Check-in</span><i class="marquee__dot"></i>
+          <span class="marquee__em">No Proxy Sign-ins</span><i class="marquee__dot"></i>
+          <span>Catch Every Student</span><i class="marquee__dot"></i>
+          <span class="marquee__em">Before Monday Morning</span><i class="marquee__dot"></i>
+        </div>
+        <div class="marquee__group">
+          <span>Fingerprint Check-in</span><i class="marquee__dot"></i>
+          <span class="marquee__em">No Proxy Sign-ins</span><i class="marquee__dot"></i>
+          <span>Catch Every Student</span><i class="marquee__dot"></i>
+          <span class="marquee__em">Before Monday Morning</span><i class="marquee__dot"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 06 THE TEAM ============ -->
+    <section class="section team-sec" id="team" aria-labelledby="team-heading">
+      <div class="shell">
+        <div class="section-head section-head--rule">
+          <p class="eyebrow mono"><span>06</span> The Team</p>
+          <h2 class="h2 reveal" id="team-heading">The team behind <em>Attesta.</em></h2>
+          <div class="section-head__lead">
+            <p>Five engineers from cohort SE 18 at IIT Colombo. Select a member to open their dossier — the system they owned, and what they shipped.</p>
+          </div>
+        </div>
+
+        <!-- The Interactive Group Photo Ensemble Stage -->
+        <div class="team-stage" data-reveal>
+          <span class="team-stage__crop team-stage__crop--tl" aria-hidden="true"></span>
+          <span class="team-stage__crop team-stage__crop--tr" aria-hidden="true"></span>
+          <span class="team-stage__crop team-stage__crop--bl" aria-hidden="true"></span>
+          <span class="team-stage__crop team-stage__crop--br" aria-hidden="true"></span>
+
+          <!-- Background Cybernetic Grid & Atmospheric Beam -->
+          <div class="team-stage__glow" aria-hidden="true"></div>
+          <div class="team-stage__scanbeam" aria-hidden="true"></div>
+          <div class="team-stage__grid" aria-hidden="true"></div>
+
+          <!-- Group Photo Layer with Individual Hover Target Zones -->
+          <div class="team-group" role="region" aria-label="Attesta Team Group Photo">
+            <!-- Hand-drawn annotation that tracks the selected member -->
+            <div class="team-note" data-team-note aria-hidden="true">
+              <p class="team-note__text" data-note-text>Sanuth — our leader, and the bridge to the hardware</p>
+              <svg class="team-note__arrow" viewBox="0 0 72 118" aria-hidden="true">
+                <path class="team-note__line" d="M40 6C26 20 22 34 33 45c9 9 20 10 19 25-1 12-11 20-20 24" />
+                <path class="team-note__head" d="M22 84l10 10 12-7" />
+              </svg>
+            </div>
+
+            <!-- Member 1: Damsith (Left) -->
+            <div class="team-member team-member--1" data-team-member="0" tabindex="0" role="button" aria-label="Damsith - Developer">
+              <img class="team-member__img" src="./team/member-1.png" alt="Damsith" loading="lazy" />
+              <div class="team-member__pin mono">
+                <span class="team-member__pin-dot"></span>
+                <span>01 // DAMSITH</span>
+              </div>
+            </div>
+
+            <!-- Member 2: Saseni (Mid-Left) -->
+            <div class="team-member team-member--2" data-team-member="1" tabindex="0" role="button" aria-label="Saseni - Web & UI/UX">
+              <img class="team-member__img" src="./team/member-2.png" alt="Saseni" loading="lazy" />
+              <div class="team-member__pin mono">
+                <span class="team-member__pin-dot"></span>
+                <span>02 // SASENI</span>
+              </div>
+            </div>
+
+            <!-- Member 3: Sanuth (Center Anchor) -->
+            <div class="team-member team-member--3 is-active" data-team-member="2" tabindex="0" role="button" aria-label="Sanuth - Group Leader & IoT">
+              <img class="team-member__img" src="./team/member-3.png" alt="Sanuth" loading="lazy" />
+              <div class="team-member__pin mono">
+                <span class="team-member__pin-dot"></span>
+                <span>03 // SANUTH</span>
+              </div>
+            </div>
+
+            <!-- Member 4: Tharushi (Mid-Right) -->
+            <div class="team-member team-member--4" data-team-member="3" tabindex="0" role="button" aria-label="Tharushi - AI Model">
+              <img class="team-member__img" src="./team/member-4.png" alt="Tharushi" loading="lazy" />
+              <div class="team-member__pin mono">
+                <span class="team-member__pin-dot"></span>
+                <span>04 // THARUSHI</span>
+              </div>
+            </div>
+
+            <!-- Member 5: Sasith (Right) -->
+            <div class="team-member team-member--5" data-team-member="4" tabindex="0" role="button" aria-label="Sasith - Mobile App">
+              <img class="team-member__img" src="./team/member-5.png" alt="Sasith" loading="lazy" />
+              <div class="team-member__pin mono">
+                <span class="team-member__pin-dot"></span>
+                <span>05 // SASITH</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Plinth Base / Stage Floor -->
+          <div class="team-stage__plinth" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 07 FINALE SCAN TERMINAL ============ -->
+    <section class="finale" id="contact">
+      <div class="finale__inner">
+        <p class="eyebrow eyebrow--lime mono"><span>07</span> Try the Sensor</p>
+        <h2 class="finale__title">Hold your finger.<br />Mark yourself <em>present.</em></h2>
+        <p class="finale__sub">Press and hold the sensor below for 1.2 seconds — mouse or finger — to try a real check-in.</p>
+
+        <div class="scan-button-wrap">
+          <button class="scan-button" type="button" data-scan-button aria-label="Hold to authenticate biometric presence">
+            <svg class="scan-button__svg" viewBox="0 0 400 480" aria-hidden="true">
+              <g class="scan-button__base" data-scan-base></g>
+              <g class="scan-button__fill" data-scan-fill></g>
+            </svg>
+            <span class="scan-button__progress" aria-hidden="true"></span>
+          </button>
+          <div class="scan-button__meta">
+            <span class="mono" data-scan-hint>HOLD 1.2s</span>
+            <span class="mono" data-scan-readout>WAITING FOR FINGER</span>
+          </div>
+          <p class="scan-button__stamp" data-scan-stamp>PRESENT ✓</p>
+          <p class="visually-hidden" data-scan-live aria-live="polite"></p>
+        </div>
+
+        <div class="finale__reveal" data-finale-reveal>
+          <p class="finale__thanks">Fingerprint matched. Record #0482 saved. You're marked present on Attesta.</p>
+          <div class="finale__links">
+            <a href="#top">Return to Hero</a>
+            <a href="#solution">How the Loop Works</a>
+            <a href="#team">Meet the Team</a>
+          </div>
+          <button class="text-btn text-btn--muted mono" type="button" data-scan-reset>↻ Try Again</button>
+        </div>
+
+        <div class="finale__meta mono">
+          <span>ATTESTA BIOMETRICS</span>
+          <span>HARDWARE + STUDENT SUPPORT</span>
+          <span>RELEASE 2026</span>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <div class="footer__mark" aria-hidden="true">ATTESTA</div>
+        <div class="footer__foot">
+          <p class="mono">EVERY CHECK-IN COUNTS.</p>
+          <a class="footer__top mono" href="#top" data-back-top>BACK TO TOP <span>↑</span></a>
+        </div>
+      </footer>
+    </section>
+  </main>
+
+  <!-- ============ WAITLIST DIALOG ============ -->
+  <div class="waitlist" data-waitlist hidden>
+    <div class="waitlist__backdrop" data-waitlist-close aria-hidden="true"></div>
+
+    <div class="waitlist__panel" role="dialog" aria-modal="true" aria-labelledby="waitlist-title" aria-describedby="waitlist-sub">
+      <span class="waitlist__crop waitlist__crop--tl" aria-hidden="true"></span>
+      <span class="waitlist__crop waitlist__crop--tr" aria-hidden="true"></span>
+      <span class="waitlist__crop waitlist__crop--bl" aria-hidden="true"></span>
+      <span class="waitlist__crop waitlist__crop--br" aria-hidden="true"></span>
+
+      <div class="waitlist__top mono">
+        <span><i class="dot dot--live"></i> PRESENCE VERIFIED · #0482</span>
+        <button class="waitlist__close" type="button" data-waitlist-close aria-label="Close waitlist">CLOSE ✕</button>
+      </div>
+
+      <div class="waitlist__body" data-waitlist-body>
+        <p class="eyebrow eyebrow--lime mono"><span>+</span> Early access</p>
+        <h2 class="waitlist__title" id="waitlist-title">Join the <em>waitlist.</em></h2>
+        <p class="waitlist__sub" id="waitlist-sub">You just marked yourself present. Leave your details and we'll tell you the moment Attesta opens at your campus.</p>
+
+        <form class="waitlist__form" data-waitlist-form novalidate>
+          <div class="waitlist__row">
+            <label class="waitlist__field">
+              <span class="mono">FULL NAME</span>
+              <input type="text" name="name" autocomplete="name" placeholder="A. Fernando" required />
+            </label>
+            <label class="waitlist__field">
+              <span class="mono">UNIVERSITY EMAIL</span>
+              <input type="email" name="email" autocomplete="email" placeholder="you@university.edu" required />
+            </label>
+          </div>
+
+          <div class="waitlist__row">
+            <label class="waitlist__field">
+              <span class="mono">UNIVERSITY</span>
+              <input type="text" name="university" autocomplete="organization" placeholder="IIT Colombo" />
+            </label>
+            <label class="waitlist__field">
+              <span class="mono">I AM A</span>
+              <select name="role">
+                <option value="student">Student</option>
+                <option value="lecturer">Lecturer</option>
+                <option value="administrator">Administrator</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="waitlist__actions">
+            <button class="btn btn--ink waitlist__submit" type="submit">
+              <span>Join the waitlist</span><span class="btn__arrow">→</span>
+            </button>
+            <p class="waitlist__note mono" data-waitlist-status aria-live="polite">NO SPAM · ONE EMAIL WHEN YOUR CAMPUS OPENS</p>
+          </div>
+        </form>
+      </div>
+
+      <div class="waitlist__done" data-waitlist-done hidden>
+        <span class="waitlist__done-mark" aria-hidden="true">✓</span>
+        <h2 class="waitlist__title">You're on <em>the list.</em></h2>
+        <p class="waitlist__sub">Thanks — we'll email you the moment Attesta opens at your campus.</p>
+        <button class="text-btn mono" type="button" data-waitlist-close>Back to the site →</button>
+      </div>
+    </div>
+  </div>
+
+  <noscript>
+    <style>
+      [data-preloader], .cursor, .rail { display: none !important; }
+      .is-loading { overflow: auto !important; }
+      .line__inner { transform: none !important; }
+    </style>
+  </noscript>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

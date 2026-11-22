@@ -1,0 +1,183 @@
+/* ============================================================
+   03 — THE ATTESTA LOOP (About & Solution)
+   A four-step closed loop: prove, record, reveal, recover.
+   Absorbs the old Hardware and Compare sections.
+   ============================================================ */
+
+.loop-sec {
+  position: relative;
+  border-top: 1px solid var(--line);
+  background:
+    radial-gradient(70% 55% at 50% 0%, rgba(0, 255, 102, 0.055), transparent 70%),
+    var(--void);
+}
+
+.loop {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: clamp(32px, 4.4vw, 60px) 0 0;
+  padding: 0;
+  list-style: none;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.loop__step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: clamp(16px, 2.2vw, 30px);
+  padding: clamp(24px, 3vw, 42px);
+  background: var(--void);
+  transition: background 0.4s var(--ease-out);
+}
+
+.loop__step:hover {
+  background: rgba(0, 255, 102, 0.025);
+}
+
+.loop__num {
+  padding-top: 4px;
+  color: var(--signal);
+  font-size: 0.55rem;
+  letter-spacing: 0.16em;
+}
+
+.loop__kicker {
+  margin-bottom: 9px;
+  color: var(--ink-4);
+  font-size: 0.5rem;
+  letter-spacing: 0.22em;
+}
+
+.loop__step h3 {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2vw, 1.95rem);
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+}
+
+.loop__step p {
+  max-width: 44ch;
+  margin-top: 10px;
+  color: var(--ink-3);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.loop__hardware {
+  display: grid;
+  grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.38fr);
+  gap: clamp(20px, 3vw, 52px);
+  align-items: start;
+  margin-top: clamp(30px, 4vw, 54px);
+  padding-top: clamp(20px, 2.4vw, 30px);
+  border-top: 1px solid var(--line-strong);
+}
+
+.loop__label {
+  color: var(--signal);
+  font-size: 0.5rem;
+  letter-spacing: 0.2em;
+}
+
+.loop__specs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(14px, 2vw, 26px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.loop__specs li {
+  display: grid;
+  gap: 6px;
+  padding-left: 12px;
+  border-left: 1px solid var(--line);
+}
+
+.loop__specs span:first-child {
+  color: var(--ink-4);
+  font-size: 0.46rem;
+  letter-spacing: 0.14em;
+}
+
+.loop__specs span:last-child {
+  color: var(--ink-2);
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.loop__versus {
+  margin-top: clamp(30px, 4vw, 54px);
+  padding-top: clamp(20px, 2.4vw, 30px);
+  border-top: 1px solid var(--line-strong);
+}
+
+.loop__versus-list {
+  display: grid;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.loop__versus-list li {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.22fr) minmax(0, 1fr);
+  gap: clamp(14px, 2vw, 28px);
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-3);
+  font-size: 0.92rem;
+}
+
+.loop__versus-list .loop__vs {
+  padding-top: 2px;
+  color: var(--ink-4);
+  font-size: 0.5rem;
+  letter-spacing: 0.16em;
+}
+
+.loop__versus-list li.is-attesta {
+  margin-left: -14px;
+  padding-left: 14px;
+  border-left: 2px solid var(--signal);
+  background: linear-gradient(90deg, rgba(0, 255, 102, 0.07), transparent 72%);
+  color: var(--ink);
+}
+
+.loop__versus-list li.is-attesta .loop__vs {
+  color: var(--signal);
+}
+
+@media (max-width: 900px) {
+  .loop {
+    grid-template-columns: 1fr;
+  }
+
+  .loop__hardware {
+    grid-template-columns: 1fr;
+  }
+
+  .loop__specs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .loop__step {
+    padding: 22px 18px;
+  }
+
+  .loop__specs {
+    grid-template-columns: 1fr;
+  }
+
+  .loop__versus-list li {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}

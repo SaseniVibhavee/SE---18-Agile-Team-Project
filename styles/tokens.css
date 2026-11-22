@@ -1,0 +1,147 @@
+/* ============================================================
+   ATTESTA — design tokens  ·  CYBER EMERALD & OBSIDIAN
+   Deep black void, electric emerald green dominance,
+   and precision orange warning accents.
+   ============================================================ */
+
+:root {
+  /* — surfaces (pure black & obsidian) — */
+  --void: #010302;
+  --paper: #040805;
+  --paper-2: #080f09;
+  --paper-3: #0e1810;
+  --paper-light: #142217;
+
+  /* — typography colours — */
+  --ink: #f2fbf4;
+  --ink-2: #c4d8c8;
+  --ink-3: #879f8c;
+  --ink-4: #4e6553;
+
+  /* — accents: MORE GREEN, LESS ORANGE — */
+  --signal: #00ff66; /* Primary electric cyber green */
+  --signal-2: #00cc52;
+  --signal-dim: rgba(0, 255, 102, 0.12);
+  --signal-glow: rgba(0, 255, 102, 0.4);
+
+  --ember: #ff6a00; /* Secondary warning / proxy orange (used sparingly) */
+  --ember-2: #e05500;
+  --ember-dim: rgba(255, 106, 0, 0.14);
+  --ember-glow: rgba(255, 106, 0, 0.35);
+
+  --ion: #00f0ff; /* Technical data Cyan */
+  --teal: #05140b;
+  --teal-2: #092414;
+  --teal-3: #0f361f;
+
+  /* legacy aliases — compatibility */
+  --vermilion: var(--ember);
+  --vermilion-2: var(--ember-2);
+  --lime: var(--signal);
+  --lime-2: var(--signal-2);
+
+  /* — lines & borders — */
+  --line: rgba(0, 255, 102, 0.11);
+  --line-strong: rgba(0, 255, 102, 0.32);
+  --line-light: rgba(242, 251, 244, 0.05);
+
+  /* — typography (Poppins display + body, JetBrains Mono for data readouts) — */
+  --font-display: "Poppins", system-ui, sans-serif;
+  --font-body: "Poppins", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Courier New", monospace;
+  --font-hand: "Caveat", "Segoe Script", "Bradley Hand", cursive;
+
+  --fs-hero: clamp(3.2rem, 11.2vw, 12.8rem);
+  --fs-h2: clamp(2.4rem, 5.2vw, 5.4rem);
+  --fs-h3: clamp(1.4rem, 2.3vw, 2.2rem);
+  --fs-lead: clamp(1.02rem, 1.25vw, 1.28rem);
+  --fs-body: clamp(0.95rem, 1vw, 1.06rem);
+  --fs-mono: clamp(0.64rem, 0.72vw, 0.76rem);
+  --fs-hand: clamp(1.1rem, 1.4vw, 1.4rem);
+
+  /* — layout — */
+  --gutter: clamp(18px, 4vw, 64px);
+  --section-y: clamp(72px, 8.5vw, 140px);
+  --max: 1560px;
+  --nav-h: 72px;
+
+  /* — motion — */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur: 0.65s;
+
+  /* — neon glow — */
+  --glow-signal: 0 0 24px rgba(0, 255, 102, 0.45), 0 0 60px rgba(0, 255, 102, 0.18);
+  --glow-ember: 0 0 24px rgba(255, 106, 0, 0.45), 0 0 60px rgba(255, 106, 0, 0.18);
+  --glow-ion: 0 0 22px rgba(0, 240, 255, 0.4);
+
+  /* — shadows — */
+  --shadow-sheet: 0 4px 20px rgba(0, 0, 0, 0.8), 0 26px 60px -22px rgba(0, 0, 0, 0.95);
+  --shadow-lift: 0 34px 80px -30px rgba(0, 0, 0, 0.98);
+}
+
+/* ============================================================
+   LIGHT / WHITE THEME — SURGICAL EMERALD & CRISP WHITE PAPER
+   Calibrated so all typography, cards, and borders invert with
+   maximum contrast and zero white-on-white text issues.
+   ============================================================ */
+:root[data-theme="light"],
+[data-theme="light"] {
+  /* — surfaces (pure crisp white & light paper) — */
+  --void: #ffffff;
+  --paper: #f6faf6;
+  --paper-2: #ffffff;
+  --paper-3: #edf4ee;
+  --paper-light: #e2ebe3;
+
+  /* — typography colours (deep dark emerald ink) — */
+  --ink: #061108;
+  --ink-2: #1e3322;
+  --ink-3: #4b664f;
+  --ink-4: #7a947e;
+
+  /* — accents: high-contrast emerald & ember on white — */
+  --signal: #008f37;
+  --signal-2: #00732c;
+  --signal-dim: rgba(0, 143, 55, 0.08);
+  --signal-glow: rgba(0, 143, 55, 0.22);
+
+  --ember: #d84300;
+  --ember-2: #b83400;
+  --ember-dim: rgba(216, 67, 0, 0.08);
+  --ember-glow: rgba(216, 67, 0, 0.2);
+
+  --ion: #007f91;
+  --teal: #eef7f0;
+  --teal-2: #ddede0;
+  --teal-3: #cbdece;
+
+  /* — lines & borders — */
+  --line: rgba(6, 17, 8, 0.1);
+  --line-strong: rgba(0, 143, 55, 0.38);
+  --line-light: rgba(6, 17, 8, 0.05);
+
+  /* — glows & shadows for white paper — */
+  --glow-signal: 0 0 20px rgba(0, 143, 55, 0.28), 0 0 44px rgba(0, 143, 55, 0.1);
+  --glow-ember: 0 0 20px rgba(216, 67, 0, 0.25), 0 0 44px rgba(216, 67, 0, 0.1);
+  --glow-ion: 0 0 20px rgba(0, 127, 145, 0.25);
+
+  --shadow-sheet: 0 4px 20px rgba(6, 17, 8, 0.06), 0 20px 48px -16px rgba(6, 17, 8, 0.12);
+  --shadow-lift: 0 24px 60px -20px rgba(6, 17, 8, 0.14);
+}
+
+/* Inverted / contrast cards */
+.on-light,
+.on-dark {
+  --paper: #080f0a;
+  --paper-2: #0e1710;
+  --paper-3: #142217;
+  --paper-light: #1b2c1f;
+  --ink: #f2fbf4;
+  --ink-2: #c4d8c8;
+  --ink-3: #879f8c;
+  --ink-4: #4e6553;
+  --line: rgba(0, 255, 102, 0.14);
+  --line-strong: rgba(0, 255, 102, 0.38);
+  --line-light: rgba(242, 251, 244, 0.08);
+}
